@@ -9,26 +9,25 @@ def index():
 
 @app.route('/play', methods=['POST'])
 def play():
-    data = request.get_json()
+    data = request.get_json()   # ✅ FIXED HERE
     user_choice = data['choice']
 
     choices = ['stone', 'paper', 'scissor']
     computer_choice = random.choice(choices)
 
     if user_choice == computer_choice:
-        result = "draw"
+        result = "Draw! 🤝"
     elif (user_choice == 'stone' and computer_choice == 'scissor') or \
          (user_choice == 'paper' and computer_choice == 'stone') or \
          (user_choice == 'scissor' and computer_choice == 'paper'):
-        result = "win"
+        result = "You Win! 🎉"
     else:
-        result = "lose"
+        result = "You Lose! 😢"
 
     return jsonify({
-        "user": user_choice,
-        "computer": computer_choice,
-        "result": result
+        'computer': computer_choice,
+        'result': result
     })
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
