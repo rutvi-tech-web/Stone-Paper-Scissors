@@ -4,29 +4,29 @@ import random
 app = Flask(__name__)
 
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
 @app.route('/play', methods=['POST'])
 def play():
     data = request.get_json()
-    user = data['choice']
+    user_choice = data['choice']
 
     choices = ['stone', 'paper', 'scissor']
-    cpu = random.choice(choices)
+    computer_choice = random.choice(choices)
 
-    if user == cpu:
+    if user_choice == computer_choice:
         result = "draw"
-    elif (user == 'stone' and cpu == 'scissor') or \
-         (user == 'paper' and cpu == 'stone') or \
-         (user == 'scissor' and cpu == 'paper'):
+    elif (user_choice == 'stone' and computer_choice == 'scissor') or \
+         (user_choice == 'paper' and computer_choice == 'stone') or \
+         (user_choice == 'scissor' and computer_choice == 'paper'):
         result = "win"
     else:
         result = "lose"
 
     return jsonify({
-        "user": user,
-        "cpu": cpu,
+        "user": user_choice,
+        "computer": computer_choice,
         "result": result
     })
 
