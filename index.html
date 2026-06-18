@@ -6,44 +6,85 @@
 
 <style>
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     text-align: center;
-    background: #111;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
     color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 h1 {
-    color: #ff4d6d;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #e94560;
 }
 
-.score {
+.score-board {
     display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin: 20px;
+    gap: 40px;
+    margin: 20px 0;
+    font-size: 1.2rem;
 }
 
-.box {
-    background: #222;
-    padding: 10px 20px;
+.score-board div {
+    background: rgba(255,255,255,0.1);
+    padding: 10px 25px;
     border-radius: 10px;
 }
 
-button {
-    font-size: 40px;
-    margin: 10px;
-    padding: 15px;
+.choices {
+    display: flex;
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.btn {
+    font-size: 3rem;
+    padding: 20px 30px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.1);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn:hover {
+    transform: scale(1.2);
+    background: #e94560;
+}
+
+.result-box {
+    margin-top: 20px;
+    padding: 20px 40px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    font-size: 1.3rem;
+    min-width: 300px;
+}
+
+#result-text {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #e94560;
+}
+
+.reset-btn {
+    margin-top: 20px;
+    padding: 10px 30px;
+    font-size: 1rem;
+    background: #e94560;
+    color: white;
+    border: none;
     border-radius: 10px;
     cursor: pointer;
 }
 
-button:hover {
-    transform: scale(1.1);
-}
-
-#result {
-    margin-top: 20px;
-    font-size: 22px;
+.reset-btn:hover {
+    background: #c73652;
 }
 </style>
 </head>
@@ -52,67 +93,80 @@ button:hover {
 
 <h1>🎮 Stone Paper Scissor</h1>
 
-<div class="score">
-    <div class="box">You: <span id="userScore">0</span></div>
-    <div class="box">CPU: <span id="cpuScore">0</span></div>
-    <div class="box">Draw: <span id="drawScore">0</span></div>
+<div class="score-board">
+    <div>😊 You: <span id="user-score">0</span></div>
+    <div>🤝 Draw: <span id="draw-score">0</span></div>
+    <div>🤖 CPU: <span id="cpu-score">0</span></div>
 </div>
 
-<button onclick="play('stone')">🪨</button>
-<button onclick="play('paper')">📄</button>
-<button onclick="play('scissor')">✂️</button>
+<div class="choices">
+    <button class="btn" onclick="play('stone')">🪨</button>
+    <button class="btn" onclick="play('paper')">📄</button>
+    <button class="btn" onclick="play('scissor')">✂️</button>
+</div>
 
-<h2 id="result">Start Game</h2>
+<div class="result-box">
+    <p>Your choice: <span id="user-choice">—</span></p>
+    <p>CPU choice: <span id="cpu-choice">—</span></p>
+    <p id="result-text">Pick a move!</p>
+</div>
 
-<br>
-<button onclick="resetGame()">🔄 Reset</button>
+<button class="reset-btn" onclick="resetScore()">🔄 Reset Score</button>
 
 <script>
 let userScore = 0;
 let cpuScore = 0;
 let drawScore = 0;
 
+const emoji = {
+    stone: "🪨",
+    paper: "📄",
+    scissor: "✂️"
+};
+
 function play(choice) {
     fetch('/play', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ choice })
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({choice})
     })
     .then(res => res.json())
     .then(data => {
 
+        document.getElementById("user-choice").innerText = emoji[data.user];
+        document.getElementById("cpu-choice").innerText = emoji[data.computer];
+
         if (data.result === "win") {
             userScore++;
-            document.getElementById("result").innerText = "🎉 You Win!";
+            document.getElementById("result-text").innerText = "🎉 You Win!";
         } 
         else if (data.result === "lose") {
             cpuScore++;
-            document.getElementById("result").innerText = "😢 You Lose!";
+            document.getElementById("result-text").innerText = "😢 You Lose!";
         } 
         else {
             drawScore++;
-            document.getElementById("result").innerText = "🤝 Draw!";
+            document.getElementById("result-text").innerText = "🤝 Draw!";
         }
 
-        document.getElementById("userScore").innerText = userScore;
-        document.getElementById("cpuScore").innerText = cpuScore;
-        document.getElementById("drawScore").innerText = drawScore;
-    })
-    .catch(err => console.log(err));
+        document.getElementById("user-score").innerText = userScore;
+        document.getElementById("cpu-score").innerText = cpuScore;
+        document.getElementById("draw-score").innerText = drawScore;
+    });
 }
 
-function resetGame() {
+function resetScore() {
     userScore = 0;
     cpuScore = 0;
     drawScore = 0;
 
-    document.getElementById("userScore").innerText = 0;
-    document.getElementById("cpuScore").innerText = 0;
-    document.getElementById("drawScore").innerText = 0;
+    document.getElementById("user-score").innerText = 0;
+    document.getElementById("cpu-score").innerText = 0;
+    document.getElementById("draw-score").innerText = 0;
 
-    document.getElementById("result").innerText = "Start Game";
+    document.getElementById("user-choice").innerText = "—";
+    document.getElementById("cpu-choice").innerText = "—";
+    document.getElementById("result-text").innerText = "Pick a move!";
 }
 </script>
 
