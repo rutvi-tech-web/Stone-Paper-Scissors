@@ -12,7 +12,9 @@ body {
     color: white;
 }
 
-h1 { color: #ff4d6d; }
+h1 {
+    color: #ff4d6d;
+}
 
 .score {
     display: flex;
@@ -22,8 +24,8 @@ h1 { color: #ff4d6d; }
 }
 
 .box {
-    padding: 10px 20px;
     background: #222;
+    padding: 10px 20px;
     border-radius: 10px;
 }
 
@@ -31,17 +33,17 @@ button {
     font-size: 40px;
     margin: 10px;
     padding: 15px;
-    cursor: pointer;
     border-radius: 10px;
+    cursor: pointer;
 }
 
 button:hover {
     transform: scale(1.1);
 }
 
-.result {
+#result {
     margin-top: 20px;
-    font-size: 20px;
+    font-size: 22px;
 }
 </style>
 </head>
@@ -56,22 +58,16 @@ button:hover {
     <div class="box">Draw: <span id="drawScore">0</span></div>
 </div>
 
-<div>
-    <button onclick="play('stone')">🪨</button>
-    <button onclick="play('paper')">📄</button>
-    <button onclick="play('scissor')">✂️</button>
-</div>
+<button onclick="play('stone')">🪨</button>
+<button onclick="play('paper')">📄</button>
+<button onclick="play('scissor')">✂️</button>
 
-<div class="result">
-    <p>You: <span id="userChoice">-</span></p>
-    <p>CPU: <span id="cpuChoice">-</span></p>
-    <h2 id="resultText">Start Game</h2>
-</div>
+<h2 id="result">Start Game</h2>
 
-<button onclick="resetScore()">🔄 Reset Score</button>
+<br>
+<button onclick="resetGame()">🔄 Reset</button>
 
 <script>
-
 let userScore = 0;
 let cpuScore = 0;
 let drawScore = 0;
@@ -79,35 +75,35 @@ let drawScore = 0;
 function play(choice) {
     fetch('/play', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({choice})
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ choice })
     })
     .then(res => res.json())
     .then(data => {
 
-        document.getElementById("userChoice").innerText = data.user;
-        document.getElementById("cpuChoice").innerText = data.computer;
-
-        if (data.result === "Win") {
+        if (data.result === "win") {
             userScore++;
-            document.getElementById("resultText").innerText = "🎉 You Win!";
-        }
-        else if (data.result === "Lose") {
+            document.getElementById("result").innerText = "🎉 You Win!";
+        } 
+        else if (data.result === "lose") {
             cpuScore++;
-            document.getElementById("resultText").innerText = "😢 You Lose!";
-        }
+            document.getElementById("result").innerText = "😢 You Lose!";
+        } 
         else {
             drawScore++;
-            document.getElementById("resultText").innerText = "🤝 Draw!";
+            document.getElementById("result").innerText = "🤝 Draw!";
         }
 
         document.getElementById("userScore").innerText = userScore;
         document.getElementById("cpuScore").innerText = cpuScore;
         document.getElementById("drawScore").innerText = drawScore;
-    });
+    })
+    .catch(err => console.log(err));
 }
 
-function resetScore() {
+function resetGame() {
     userScore = 0;
     cpuScore = 0;
     drawScore = 0;
@@ -116,11 +112,8 @@ function resetScore() {
     document.getElementById("cpuScore").innerText = 0;
     document.getElementById("drawScore").innerText = 0;
 
-    document.getElementById("userChoice").innerText = "-";
-    document.getElementById("cpuChoice").innerText = "-";
-    document.getElementById("resultText").innerText = "Start Game";
+    document.getElementById("result").innerText = "Start Game";
 }
-
 </script>
 
 </body>
